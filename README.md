@@ -1,5 +1,6 @@
 # rusterizer
 A basic 3D rasterizer in Rust
+
 ## Getting Started
 To build and run:
 ```
@@ -13,3 +14,9 @@ To run the benchmarks:
 ```
 cargo bench
 ```
+
+## License
+This project is licensed under the MIT License - see the LICENSE.md file for details
+
+## Acknowledgments
+* [scratchapixel](https://www.scratchapixel.com/)
