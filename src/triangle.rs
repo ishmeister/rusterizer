@@ -65,8 +65,8 @@ impl TriangleComputations<f32> {
         ];
 
         TriangleComputations::<f32> {
-            edges: edges,
-            z_inv: z_inv,
+            edges,
+            z_inv,
             w0_params,
             w1_params,
             w2_params,

@@ -62,7 +62,7 @@ impl Canvas {
     pub fn draw(
         &self,
         camera: &Camera,
-        shapes: &Vec<Shape>,
+        shapes: &[Shape],
         frame: &mut [u8],
         z_buffer: &mut [f32],
     ) {
@@ -174,7 +174,7 @@ fn draw_triangle(
     for y in y_start..y_end {
         for x in x_start..x_end {
             let (overlaps, w0, w1, w2, z) = raster_comps.get_overlap();
-            let visible = z >= 0.0 && z <= 1.0;
+            let visible = (0.0..=1.0).contains(&z);
 
             if overlaps && visible {
                 let zbuffer_idx = (x + y * canvas.width) as usize;

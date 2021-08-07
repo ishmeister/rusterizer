@@ -9,6 +9,12 @@ pub struct Matrix4x4<T> {
     elems: [[T; 4]; 4],
 }
 
+impl Default for Matrix4x4<f32> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Matrix4x4<f32> {
     pub fn new() -> Self {
         Matrix4x4::<f32> {
@@ -17,7 +23,7 @@ impl Matrix4x4<f32> {
     }
 
     pub fn of(elems: [[f32; 4]; 4]) -> Self {
-        Matrix4x4::<f32> { elems: elems }
+        Matrix4x4::<f32> { elems }
     }
 
     fn mul_point(&self, p: Vector3<f32>) -> Vector3<f32> {
@@ -29,7 +35,7 @@ impl Matrix4x4<f32> {
         // homogenous coordinate
         // the last column is almost always (0, 0, 0, 1) except when projection matrices are used
         // so the point needs to be normalised so that w = 1 again
-        if w != 1.0 && w != 0.0 {
+        if abs_diff_ne!(w, 1.0, epsilon = EPSILON) && abs_diff_ne!(w, 0.0, epsilon = EPSILON) {
             x /= w;
             y /= w;
             z /= w;
@@ -58,11 +64,11 @@ impl Matrix4x4<f32> {
         let c0 = a[2][0] * a[3][1] - a[3][0] * a[2][1];
 
         let det = s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0;
-        assert_ne!(det, 0.0);
+        assert_abs_diff_ne!(det, 0.0, epsilon = EPSILON);
 
         let invdet = 1.0 / (s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0);
 
-        let mut b = Matrix4x4::new();
+        let mut b = Matrix4x4::default();
 
         b[0][0] = (a[1][1] * c5 - a[1][2] * c4 + a[1][3] * c3) * invdet;
         b[0][1] = (-a[0][1] * c5 + a[0][2] * c4 - a[0][3] * c3) * invdet;
@@ -84,7 +90,7 @@ impl Matrix4x4<f32> {
         b[3][2] = (-a[3][0] * s3 + a[3][1] * s1 - a[3][2] * s0) * invdet;
         b[3][3] = (a[2][0] * s3 - a[2][1] * s1 + a[2][2] * s0) * invdet;
 
-        return b;
+        b
     }
 }
 
@@ -104,7 +110,7 @@ impl IndexMut<usize> for Matrix4x4<f32> {
 impl ops::Mul<Matrix4x4<f32>> for Matrix4x4<f32> {
     type Output = Matrix4x4<f32>;
     fn mul(self, rhs: Matrix4x4<f32>) -> Matrix4x4<f32> {
-        let mut m = Matrix4x4::new();
+        let mut m = Matrix4x4::default();
         for i in 0..4 {
             for j in 0..4 {
                 m[i][j] = self[i][0] * rhs[0][j]

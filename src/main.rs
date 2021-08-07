@@ -45,8 +45,7 @@ fn main() -> Result<(), Error> {
 
     let mut z_buffer = vec![f32::MAX; canvas.width as usize * canvas.height as usize];
 
-    let mut shapes = vec![];
-    shapes.push(colour_cube());
+    let mut shapes = vec![colour_cube()];
 
     let mut rotation_rad: f32 = 0.0;
     let translation = translation(0.0, 0.0, -5.0);
