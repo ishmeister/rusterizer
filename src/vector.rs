@@ -27,16 +27,16 @@ impl Vector3<f32> {
     }
 
     pub fn normalize(&self) -> Vector3<f32> {
-        let length = self.dot(*self);
-        if length > 0.0 {
-            let inv_length = 1.0 / length.sqrt();
-            Vector3::new(
-                self.x * inv_length,
-                self.y * inv_length,
-                self.z * inv_length,
-            )
+        let length = self.length();
+        if length < EPSILON {
+            Vector3::new(0.0, 0.0, 0.0)
         } else {
-            *self
+            let norm = 1.0 / length;
+            Vector3::new(
+                self.x * norm,
+                self.y * norm,
+                self.z * norm,
+            )
         }
     }
 
