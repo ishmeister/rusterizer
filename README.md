@@ -1,5 +1,8 @@
 # rusterizer
-A basic 3D rasterizer in Rust
+A simple 3D rasterizer written in Rust. This is a 100% software 3d rasterizer that runs on the CPU and draws directly to the frame buffer (i.e. it does not use a graphics library or GPU). 
+A graphics library utilising the GPU is, of course, a far superior option for any real use case so consider this as purely a learning exercise. 
+
+![screenshot](screenshot.png)
 
 ## Getting Started
 To build and run:
