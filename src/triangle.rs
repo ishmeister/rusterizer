@@ -93,12 +93,13 @@ impl TriangleComputations<f32> {
             && (w1 > 0.0 || (w1 == 0.0 && is_top_or_left_edge(&self.edges[1])))
             && (w2 > 0.0 || (w2 == 0.0 && is_top_or_left_edge(&self.edges[2])));
 
-        let mut point_z = f32::MAX;
-        if overlaps {
+        let point_z = if overlaps {
             // find the correct z of point for the depth buffer by linear interpolation
             // the reciprocal of z should already be pre-computed
-            point_z = 1.0 / (self.z_inv[0] * w0 + self.z_inv[1] * w1 + self.z_inv[2] * w2);
-        }
+            1.0 / (self.z_inv[0] * w0 + self.z_inv[1] * w1 + self.z_inv[2] * w2)
+        } else {
+            f32::MAX
+        };
 
         (overlaps, w0, w1, w2, point_z)
     }
