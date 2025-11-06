@@ -45,7 +45,7 @@ pub struct Canvas {
     pub height: u32,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct Colour {
     pub r: f32,
     pub g: f32,
@@ -116,7 +116,7 @@ fn draw_triangle(
     z_buffer: &mut [f32],
 ) {
     let to_screen = to_world * &camera.view_projection;
-    let mut colours = triangle.colours;
+    let mut colours = triangle.colours.clone();
     let mut raster_points = [
         Vector3::default(),
         Vector3::default(),

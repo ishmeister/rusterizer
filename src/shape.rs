@@ -50,9 +50,10 @@ pub fn colour_cube() -> Shape {
         let col_idx = i * 3;
         
         triangle.colours = [
-            colours[col_idx], 
-            colours[col_idx + 1], 
-            colours[col_idx + 2]];
+            colours[col_idx].clone(),
+            colours[col_idx + 1].clone(),
+            colours[col_idx + 2].clone(),
+        ];
 
         triangle.double_side = false;
         triangles.push(triangle);
