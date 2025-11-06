@@ -1,6 +1,6 @@
 extern crate rust_gfx;
 
-use criterion::{criterion_group, criterion_main, black_box, Criterion};
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 use rust_gfx::camera::default_camera;
 use rust_gfx::matrix::translation;
@@ -39,7 +39,9 @@ fn raster_benchmark(c: &mut Criterion) {
     shapes.push(colour_cube());
 
     let translation = translation(0.0, 0.0, -5.0);
-    shapes.iter_mut().for_each(|s| s.transform = translation.clone());
+    shapes
+        .iter_mut()
+        .for_each(|s| s.transform = translation.clone());
 
     c.bench_function("to_raster_space", |b| {
         b.iter(|| black_box(to_raster_space(-0.5, -0.5, width, height)))
@@ -48,7 +50,7 @@ fn raster_benchmark(c: &mut Criterion) {
     c.bench_function("set_pixel", |b| {
         b.iter(|| canvas.set_pixel(50, 50, RED, frame.as_mut_slice()))
     });
-    
+
     c.bench_function("draw_cube", |b| {
         b.iter(|| {
             canvas.draw(

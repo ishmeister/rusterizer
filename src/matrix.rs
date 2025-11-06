@@ -113,11 +113,10 @@ impl ops::Mul for &Matrix4x4<f32> {
         let mut result = Matrix4x4::default();
         for i in 0..4 {
             for j in 0..4 {
-                result[i][j] = 
-                    self[i][0] * rhs[0][j] +
-                    self[i][1] * rhs[1][j] +
-                    self[i][2] * rhs[2][j] +
-                    self[i][3] * rhs[3][j];
+                result[i][j] = self[i][0] * rhs[0][j]
+                    + self[i][1] * rhs[1][j]
+                    + self[i][2] * rhs[2][j]
+                    + self[i][3] * rhs[3][j];
             }
         }
         result
@@ -130,11 +129,10 @@ impl ops::Mul for Matrix4x4<f32> {
         let mut result = Matrix4x4::default();
         for i in 0..4 {
             for j in 0..4 {
-                result[i][j] = 
-                    self[i][0] * rhs[0][j] +
-                    self[i][1] * rhs[1][j] +
-                    self[i][2] * rhs[2][j] +
-                    self[i][3] * rhs[3][j];
+                result[i][j] = self[i][0] * rhs[0][j]
+                    + self[i][1] * rhs[1][j]
+                    + self[i][2] * rhs[2][j]
+                    + self[i][3] * rhs[3][j];
             }
         }
         result

@@ -17,25 +17,28 @@ pub fn colour_cube() -> Shape {
         [-1.0, 1.0, -1.0],
         [-1.0, -1.0, -1.0],
         [1.0, -1.0, -1.0],
-        [1.0, 1.0, -1.0]
+        [1.0, 1.0, -1.0],
     ];
 
     let triangle_idxs = [
-        [0, 1, 2], [2, 3, 0], 
-        [7, 6, 5], [5, 4, 7],
-        [4, 5, 1], [1 ,0, 4],
-        [3, 2, 6], [6 ,7, 3],
-        [4, 0, 3], [3, 7, 4],
-        [1, 5, 6], [6, 2, 1]
+        [0, 1, 2],
+        [2, 3, 0],
+        [7, 6, 5],
+        [5, 4, 7],
+        [4, 5, 1],
+        [1, 0, 4],
+        [3, 2, 6],
+        [6, 7, 3],
+        [4, 0, 3],
+        [3, 7, 4],
+        [1, 5, 6],
+        [6, 2, 1],
     ];
 
     let colours = [
-        BLUE, RED, GREEN, GREEN, RED, BLUE, 
-        BLUE, RED, GREEN, GREEN, RED, BLUE, 
-        RED, GREEN, RED, RED, BLUE, RED, 
-        RED, GREEN, RED, RED, BLUE, RED, 
-        RED, BLUE, RED, RED, BLUE, RED, 
-        RED, GREEN, RED, RED, GREEN, RED,
+        BLUE, RED, GREEN, GREEN, RED, BLUE, BLUE, RED, GREEN, GREEN, RED, BLUE, RED, GREEN, RED,
+        RED, BLUE, RED, RED, GREEN, RED, RED, BLUE, RED, RED, BLUE, RED, RED, BLUE, RED, RED,
+        GREEN, RED, RED, GREEN, RED,
     ];
 
     let mut triangles = vec![];
@@ -48,7 +51,7 @@ pub fn colour_cube() -> Shape {
         ]);
 
         let col_idx = i * 3;
-        
+
         triangle.colours = [
             colours[col_idx].clone(),
             colours[col_idx + 1].clone(),

@@ -1,5 +1,5 @@
-use crate::EPSILON;
 use crate::matrix::Matrix4x4;
+use crate::EPSILON;
 use std::f32;
 use std::ops;
 
@@ -37,11 +37,7 @@ impl Vector3<f32> {
             Vector3::new(0.0, 0.0, 0.0)
         } else {
             let norm = 1.0 / length;
-            Vector3::new(
-                self.x * norm,
-                self.y * norm,
-                self.z * norm,
-            )
+            Vector3::new(self.x * norm, self.y * norm, self.z * norm)
         }
     }
 

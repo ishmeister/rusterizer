@@ -59,13 +59,7 @@ impl Canvas {
         Self { width, height }
     }
 
-    pub fn draw(
-        &self,
-        camera: &Camera,
-        shapes: &[Shape],
-        frame: &mut [u8],
-        z_buffer: &mut [f32],
-    ) {
+    pub fn draw(&self, camera: &Camera, shapes: &[Shape], frame: &mut [u8], z_buffer: &mut [f32]) {
         for shape in shapes.iter() {
             shape.draw(camera, self, frame, z_buffer);
         }
@@ -117,11 +111,7 @@ fn draw_triangle(
 ) {
     let to_screen = to_world * &camera.view_projection;
     let mut colours = triangle.colours.clone();
-    let mut raster_points = [
-        Vector3::default(),
-        Vector3::default(),
-        Vector3::default(),
-    ];
+    let mut raster_points = [Vector3::default(), Vector3::default(), Vector3::default()];
     let mut z_clipped = false;
 
     for i in 0..3 {

@@ -61,7 +61,9 @@ fn main() -> Result<(), Error> {
                 rotation_x(rotation_rad) * rotation_y(rotation_rad) * rotation_z(rotation_rad);
 
             let transform = &scaling * &translation * rotation;
-            shapes.iter_mut().for_each(|s| s.transform = transform.clone());
+            shapes
+                .iter_mut()
+                .for_each(|s| s.transform = transform.clone());
 
             canvas.draw(&camera, &shapes, frame, &mut z_buffer);
 
