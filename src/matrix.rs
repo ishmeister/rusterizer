@@ -4,7 +4,7 @@ use std::f32;
 use std::ops;
 use std::ops::{Index, IndexMut};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone)]
 pub struct Matrix4x4<T> {
     elems: [[T; 4]; 4],
 }
@@ -22,11 +22,11 @@ impl Matrix4x4<f32> {
         }
     }
 
-    pub fn of(elems: [[f32; 4]; 4]) -> Self {
+    pub fn from(elems: [[f32; 4]; 4]) -> Self {
         Matrix4x4::<f32> { elems }
     }
 
-    fn mul_point(&self, p: Vector3<f32>) -> Vector3<f32> {
+    pub fn mul_point(&self, p: &Vector3<f32>) -> Vector3<f32> {
         let mut x = p.x * self[0][0] + p.y * self[1][0] + p.z * self[2][0] + self[3][0];
         let mut y = p.x * self[0][1] + p.y * self[1][1] + p.z * self[2][1] + self[3][1];
         let mut z = p.x * self[0][2] + p.y * self[1][2] + p.z * self[2][2] + self[3][2];
@@ -46,7 +46,7 @@ impl Matrix4x4<f32> {
 
     /// optimised 4x4 matrix inverse function based on: http://www.geometrictools.com/Documentation/LaplaceExpansionTheorem.pdf
     /// code from: https://stackoverflow.com/questions/2624422/efficient-4x4-matrix-inverse-affine-transform
-    pub fn inverse(&self) -> Matrix4x4<f32> {
+    pub fn inverse(self) -> Matrix4x4<f32> {
         let a = self;
 
         let s0 = a[0][0] * a[1][1] - a[1][0] * a[0][1];
@@ -107,34 +107,37 @@ impl IndexMut<usize> for Matrix4x4<f32> {
     }
 }
 
-impl ops::Mul<Matrix4x4<f32>> for Matrix4x4<f32> {
+impl ops::Mul for &Matrix4x4<f32> {
     type Output = Matrix4x4<f32>;
-    fn mul(self, rhs: Matrix4x4<f32>) -> Matrix4x4<f32> {
-        let mut m = Matrix4x4::default();
+    fn mul(self, rhs: &Matrix4x4<f32>) -> Matrix4x4<f32> {
+        let mut result = Matrix4x4::default();
         for i in 0..4 {
             for j in 0..4 {
-                m[i][j] = self[i][0] * rhs[0][j]
-                    + self[i][1] * rhs[1][j]
-                    + self[i][2] * rhs[2][j]
-                    + self[i][3] * rhs[3][j];
+                result[i][j] = 
+                    self[i][0] * rhs[0][j] +
+                    self[i][1] * rhs[1][j] +
+                    self[i][2] * rhs[2][j] +
+                    self[i][3] * rhs[3][j];
             }
         }
-        m
+        result
     }
 }
 
-impl ops::Mul<Vector3<f32>> for Matrix4x4<f32> {
-    type Output = Vector3<f32>;
-    fn mul(self, rhs: Vector3<f32>) -> Vector3<f32> {
-        self.mul_point(rhs)
-    }
-}
-
-// for row-major multiplications with a point
-impl ops::Mul<Matrix4x4<f32>> for Vector3<f32> {
-    type Output = Vector3<f32>;
-    fn mul(self, rhs: Matrix4x4<f32>) -> Vector3<f32> {
-        rhs.mul_point(self)
+impl ops::Mul for Matrix4x4<f32> {
+    type Output = Matrix4x4<f32>;
+    fn mul(self, rhs: Matrix4x4<f32>) -> Matrix4x4<f32> {
+        let mut result = Matrix4x4::default();
+        for i in 0..4 {
+            for j in 0..4 {
+                result[i][j] = 
+                    self[i][0] * rhs[0][j] +
+                    self[i][1] * rhs[1][j] +
+                    self[i][2] * rhs[2][j] +
+                    self[i][3] * rhs[3][j];
+            }
+        }
+        result
     }
 }
 
@@ -151,6 +154,8 @@ impl PartialEq for Matrix4x4<f32> {
     }
 }
 
+// TODO: these functions could be methods
+
 pub const fn identity() -> Matrix4x4<f32> {
     Matrix4x4::<f32> {
         elems: [
@@ -163,7 +168,7 @@ pub const fn identity() -> Matrix4x4<f32> {
 }
 
 pub fn translation(x: f32, y: f32, z: f32) -> Matrix4x4<f32> {
-    Matrix4x4::of([
+    Matrix4x4::from([
         [1.0, 0.0, 0.0, 0.0],
         [0.0, 1.0, 0.0, 0.0],
         [0.0, 0.0, 1.0, 0.0],
@@ -172,7 +177,7 @@ pub fn translation(x: f32, y: f32, z: f32) -> Matrix4x4<f32> {
 }
 
 pub fn scaling(x: f32, y: f32, z: f32) -> Matrix4x4<f32> {
-    Matrix4x4::of([
+    Matrix4x4::from([
         [x, 0.0, 0.0, 0.0],
         [0.0, y, 0.0, 0.0],
         [0.0, 0.0, z, 0.0],
@@ -183,7 +188,7 @@ pub fn scaling(x: f32, y: f32, z: f32) -> Matrix4x4<f32> {
 pub fn rotation_x(r: f32) -> Matrix4x4<f32> {
     let cos_r = r.cos();
     let sin_r = r.sin();
-    Matrix4x4::of([
+    Matrix4x4::from([
         [1.0, 0.0, 0.0, 0.0],
         [0.0, cos_r, sin_r, 0.0],
         [0.0, -sin_r, cos_r, 0.0],
@@ -194,7 +199,7 @@ pub fn rotation_x(r: f32) -> Matrix4x4<f32> {
 pub fn rotation_y(r: f32) -> Matrix4x4<f32> {
     let cos_r = r.cos();
     let sin_r = r.sin();
-    Matrix4x4::of([
+    Matrix4x4::from([
         [cos_r, 0.0, -sin_r, 0.0],
         [0.0, 1.0, 0.0, 0.0],
         [sin_r, 0.0, cos_r, 0.0],
@@ -205,7 +210,7 @@ pub fn rotation_y(r: f32) -> Matrix4x4<f32> {
 pub fn rotation_z(r: f32) -> Matrix4x4<f32> {
     let cos_r = r.cos();
     let sin_r = r.sin();
-    Matrix4x4::of([
+    Matrix4x4::from([
         [cos_r, sin_r, 0.0, 0.0],
         [-sin_r, cos_r, 0.0, 0.0],
         [0.0, 0.0, 1.0, 0.0],
@@ -240,28 +245,28 @@ mod tests {
 
     #[test]
     fn matrix4x4_identity_multiply() {
-        let a = Matrix4x4::of([
+        let a = Matrix4x4::from([
             [0.0, 1.0, 2.0, 4.0],
             [1.0, 2.0, 4.0, 8.0],
             [2.0, 4.0, 8.0, 16.0],
             [4.0, 8.0, 16.0, 32.0],
         ]);
 
-        let b = a * identity();
+        let b = &a * &identity();
 
         assert_eq!(a, b);
     }
 
     #[test]
     fn matrix4x4_multiply() {
-        let a = Matrix4x4::of([
+        let a = Matrix4x4::from([
             [1.0, 2.0, 3.0, 4.0],
             [5.0, 6.0, 7.0, 8.0],
             [9.0, 8.0, 7.0, 6.0],
             [5.0, 4.0, 3.0, 2.0],
         ]);
 
-        let b = Matrix4x4::of([
+        let b = Matrix4x4::from([
             [-2.0, 1.0, 2.0, 3.0],
             [3.0, 2.0, 1.0, -1.0],
             [4.0, 3.0, 6.0, 5.0],
@@ -270,7 +275,7 @@ mod tests {
 
         let c = a * b;
 
-        let expected = Matrix4x4::of([
+        let expected = Matrix4x4::from([
             [20.0, 22.0, 50.0, 48.0],
             [44.0, 54.0, 114.0, 108.0],
             [40.0, 58.0, 110.0, 102.0],
@@ -284,7 +289,7 @@ mod tests {
     fn multiply_point_by_translation_matrix() {
         let m = translation(5.0, -3.0, 2.0);
         let p1 = Vector3::new(-3.0, 4.0, 5.0);
-        let p2 = p1 * m;
+        let p2 = p1 * &m;
         assert_eq!(Vector3::new(2.0, 1.0, 7.0), p2);
     }
 
@@ -292,7 +297,7 @@ mod tests {
     fn multiply_point_by_scaling_matrix() {
         let m = scaling(2.0, 3.0, 4.0);
         let p1 = Vector3::new(-4.0, 6.0, 8.0);
-        let p2 = p1 * m;
+        let p2 = p1 * &m;
         assert_eq!(Vector3::new(-8.0, 18.0, 32.0), p2);
     }
 
@@ -300,7 +305,7 @@ mod tests {
     fn multiply_point_by_rotation_x_matrix_90_degrees() {
         let m = rotation_x((90.0f32).to_radians());
         let p1 = Vector3::new(0.0, 1.0, 0.0);
-        let p2 = p1 * m;
+        let p2 = p1 * &m;
         assert_eq!(Vector3::new(0.0, 0.0, 1.0), p2);
     }
 
@@ -308,7 +313,7 @@ mod tests {
     fn multiply_point_by_rotation_x_matrix_45_degrees() {
         let m = rotation_x((45.0f32).to_radians());
         let p1 = Vector3::new(0.0, 1.0, 0.0);
-        let p2 = p1 * m;
+        let p2 = p1 * &m;
         assert_eq!(Vector3::new(0.0, 0.7071, 0.7071), p2);
     }
 
@@ -316,7 +321,7 @@ mod tests {
     fn multiply_point_by_rotation_y_matrix_90_degrees() {
         let m = rotation_y((90.0f32).to_radians());
         let p1 = Vector3::new(1.0, 0.0, 0.0);
-        let p2 = p1 * m;
+        let p2 = p1 * &m;
         assert_eq!(Vector3::new(0.0, 0.0, -1.0), p2);
     }
 
@@ -324,7 +329,7 @@ mod tests {
     fn multiply_point_by_rotation_y_matrix_45_degrees() {
         let m = rotation_y((45.0f32).to_radians());
         let p1 = Vector3::new(1.0, 0.0, 0.0);
-        let p2 = p1 * m;
+        let p2 = p1 * &m;
         assert_eq!(Vector3::new(0.7071, 0.0, -0.7071), p2);
     }
 
@@ -332,7 +337,7 @@ mod tests {
     fn multiply_point_by_rotation_z_matrix_90_degrees() {
         let m = rotation_z((90.0f32).to_radians());
         let p1 = Vector3::new(0.0, 1.0, 0.0);
-        let p2 = p1 * m;
+        let p2 = p1 * &m;
         assert_eq!(Vector3::new(-1.0, 0.0, 0.0), p2);
     }
 
@@ -340,7 +345,7 @@ mod tests {
     fn multiply_point_by_rotation_z_matrix_45_degrees() {
         let m = rotation_z((45.0f32).to_radians());
         let p1 = Vector3::new(0.0, 1.0, 0.0);
-        let p2 = p1 * m;
+        let p2 = p1 * &m;
         assert_eq!(Vector3::new(-0.7071, 0.7071, 0.0), p2);
     }
 
@@ -351,13 +356,13 @@ mod tests {
         let yr = rotation_y(rotation);
         let zr = rotation_z(-rotation);
         let p1 = Vector3::new(0.0, 1.0, 0.0);
-        let p2 = p1 * xr * yr * zr;
+        let p2 = p1 * &xr * &yr * &zr;
         assert_eq!(Vector3::new(0.0, -1.0, 0.0), p2);
     }
 
     #[test]
     fn matrix_inverse() {
-        let a = Matrix4x4::of([
+        let a = Matrix4x4::from([
             [-5.0, 2.0, 6.0, -8.0],
             [1.0, -5.0, 1.0, 8.0],
             [7.0, 7.0, -6.0, -7.0],
@@ -366,7 +371,7 @@ mod tests {
 
         let b = a.inverse();
 
-        let expected = Matrix4x4::of([
+        let expected = Matrix4x4::from([
             [0.21805, 0.45113, 0.24060, -0.04511],
             [-0.80827, -1.45677, -0.44361, 0.520680],
             [-0.07895, -0.22368, -0.05263, 0.19737],
@@ -378,7 +383,7 @@ mod tests {
 
     #[test]
     fn matrix_inverse_2() {
-        let a = Matrix4x4::of([
+        let a = Matrix4x4::from([
             [8.0, -5.0, 9.0, 2.0],
             [7.0, 5.0, 6.0, 1.0],
             [-6.0, 0.0, 9.0, 6.0],
@@ -387,7 +392,7 @@ mod tests {
 
         let b = a.inverse();
 
-        let expected = Matrix4x4::of([
+        let expected = Matrix4x4::from([
             [-0.15385, -0.15385, -0.28205, -0.53846],
             [-0.07692, 0.12308, 0.02564, 0.03077],
             [0.35897, 0.35897, 0.43590, 0.92308],
@@ -399,7 +404,7 @@ mod tests {
 
     #[test]
     fn matrix_inverse_3() {
-        let a = Matrix4x4::of([
+        let a = Matrix4x4::from([
             [9.0, 3.0, 0.0, 9.0],
             [-5.0, -2.0, -6.0, -3.0],
             [-4.0, 9.0, 6.0, 4.0],
@@ -408,7 +413,7 @@ mod tests {
 
         let b = a.inverse();
 
-        let expected = Matrix4x4::of([
+        let expected = Matrix4x4::from([
             [-0.04074, -0.07778, 0.14444, -0.22222],
             [-0.07778, 0.03333, 0.36667, -0.33333],
             [-0.02901, -0.14630, -0.10926, 0.12963],
@@ -420,29 +425,30 @@ mod tests {
 
     #[test]
     fn matrix_multiply_product_by_inverse() {
-        let a = Matrix4x4::of([
+        let a = Matrix4x4::from([
             [3.0, -9.0, 7.0, 3.0],
             [3.0, -8.0, 2.0, -9.0],
             [-4.0, 4.0, 4.0, 1.0],
             [-6.0, 5.0, -1.0, 1.0],
         ]);
 
-        let b = Matrix4x4::of([
+        let b = Matrix4x4::from([
             [8.0, 2.0, 2.0, 2.0],
             [3.0, -1.0, 7.0, 0.0],
             [7.0, 0.0, 5.0, 4.0],
             [6.0, -2.0, 0.0, 5.0],
         ]);
 
-        let c = a * b;
+        let c = &a * &b;
+        let expected = c * b.inverse();
 
-        assert_eq!(a, c * b.inverse());
+        assert_eq!(a, expected);
     }
 
     #[test]
     #[should_panic]
     fn matrix_non_invertible() {
-        let a = Matrix4x4::of([
+        let a = Matrix4x4::from([
             [-4.0, 2.0, -2.0, -3.0],
             [9.0, 6.0, 2.0, 6.0],
             [-4.0, 4.0, 4.0, 1.0],

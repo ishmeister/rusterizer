@@ -1,8 +1,9 @@
 use crate::EPSILON;
+use crate::matrix::Matrix4x4;
 use std::f32;
 use std::ops;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Debug)]
 pub struct Vector3<T> {
     pub x: T,
     pub y: T,
@@ -14,7 +15,11 @@ impl Vector3<f32> {
         Vector3::<f32> { x, y, z }
     }
 
-    pub fn from_array(coords: [f32; 3]) -> Self {
+    pub fn default() -> Self {
+        Vector3::new(0.0, 0.0, 0.0)
+    }
+
+    pub fn from(coords: [f32; 3]) -> Self {
         Vector3::<f32> {
             x: coords[0],
             y: coords[1],
@@ -40,11 +45,11 @@ impl Vector3<f32> {
         }
     }
 
-    pub fn dot(&self, rhs: Vector3<f32>) -> f32 {
+    pub fn dot(&self, rhs: &Vector3<f32>) -> f32 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
 
-    pub fn cross(&self, rhs: Vector3<f32>) -> Vector3<f32> {
+    pub fn cross(&self, rhs: &Vector3<f32>) -> Vector3<f32> {
         Vector3::new(
             self.y * rhs.z - self.z * rhs.y,
             self.z * rhs.x - self.x * rhs.z,
@@ -61,23 +66,44 @@ impl PartialEq for Vector3<f32> {
     }
 }
 
-impl ops::Sub<Vector3<f32>> for Vector3<f32> {
+impl ops::Sub for Vector3<f32> {
     type Output = Vector3<f32>;
     fn sub(self, rhs: Vector3<f32>) -> Vector3<f32> {
         Vector3::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
     }
 }
 
-impl ops::Add<Vector3<f32>> for Vector3<f32> {
+impl ops::Sub<&Vector3<f32>> for &Vector3<f32> {
+    type Output = Vector3<f32>;
+    fn sub(self, rhs: &Vector3<f32>) -> Vector3<f32> {
+        Vector3::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    }
+}
+
+impl ops::Add for Vector3<f32> {
     type Output = Vector3<f32>;
     fn add(self, rhs: Vector3<f32>) -> Vector3<f32> {
         Vector3::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
     }
 }
 
-impl ops::Mul<Vector3<f32>> for Vector3<f32> {
+impl ops::Add<&Vector3<f32>> for &Vector3<f32> {
+    type Output = Vector3<f32>;
+    fn add(self, rhs: &Vector3<f32>) -> Vector3<f32> {
+        Vector3::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    }
+}
+
+impl ops::Mul for Vector3<f32> {
     type Output = Vector3<f32>;
     fn mul(self, rhs: Vector3<f32>) -> Vector3<f32> {
+        Vector3::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
+    }
+}
+
+impl ops::Mul<&Vector3<f32>> for &Vector3<f32> {
+    type Output = Vector3<f32>;
+    fn mul(self, rhs: &Vector3<f32>) -> Vector3<f32> {
         Vector3::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
     }
 }
@@ -86,6 +112,21 @@ impl ops::Mul<f32> for Vector3<f32> {
     type Output = Vector3<f32>;
     fn mul(self, s: f32) -> Vector3<f32> {
         Vector3::new(self.x * s, self.y * s, self.z * s)
+    }
+}
+
+// for row-major multiplications with a point
+impl ops::Mul<&Matrix4x4<f32>> for &Vector3<f32> {
+    type Output = Vector3<f32>;
+    fn mul(self, rhs: &Matrix4x4<f32>) -> Vector3<f32> {
+        rhs.mul_point(&self)
+    }
+}
+
+impl ops::Mul<&Matrix4x4<f32>> for Vector3<f32> {
+    type Output = Vector3<f32>;
+    fn mul(self, rhs: &Matrix4x4<f32>) -> Vector3<f32> {
+        rhs.mul_point(&self)
     }
 }
 
@@ -157,7 +198,7 @@ mod tests {
     fn vector3_dot() {
         let v1 = Vector3::new(1.0, 2.0, 3.0);
         let v2 = Vector3::new(1.0, 2.0, 3.0);
-        let d = v1.dot(v2);
+        let d = v1.dot(&v2);
         assert_abs_diff_eq!(d, 14.0, epsilon = EPSILON);
     }
 
@@ -165,7 +206,7 @@ mod tests {
     fn vector3_dot_orthogonal() {
         let v1 = Vector3::new(1.0, 0.0, 0.0);
         let v2 = Vector3::new(0.0, 1.0, 0.0);
-        let d = v1.dot(v2);
+        let d = v1.dot(&v2);
         assert_abs_diff_eq!(d, 0.0, epsilon = EPSILON);
     }
 
@@ -173,7 +214,7 @@ mod tests {
     fn vector3_dot_opposite() {
         let v1 = Vector3::new(1.0, 0.0, 0.0);
         let v2 = Vector3::new(-1.0, 0.0, 0.0);
-        let d = v1.dot(v2);
+        let d = v1.dot(&v2);
         assert_abs_diff_eq!(d, -1.0, epsilon = EPSILON);
     }
 
@@ -181,7 +222,7 @@ mod tests {
     fn vector3_cross_product_is_orthogonal() {
         let v1 = Vector3::new(1.0, 0.0, 0.0);
         let v2 = Vector3::new(0.0, 1.0, 0.0);
-        let v3 = v1.cross(v2);
+        let v3 = v1.cross(&v2);
         assert_abs_diff_eq!(v3.x, 0.0, epsilon = EPSILON);
         assert_abs_diff_eq!(v3.y, 0.0, epsilon = EPSILON);
         assert_abs_diff_eq!(v3.z, 1.0, epsilon = EPSILON);
@@ -191,7 +232,7 @@ mod tests {
     fn vector3_cross_product_reverse_is_negated() {
         let v1 = Vector3::new(1.0, 0.0, 0.0);
         let v2 = Vector3::new(0.0, 1.0, 0.0);
-        let v3 = v2.cross(v1);
+        let v3 = v2.cross(&v1);
         assert_abs_diff_eq!(v3.x, 0.0, epsilon = EPSILON);
         assert_abs_diff_eq!(v3.y, 0.0, epsilon = EPSILON);
         assert_abs_diff_eq!(v3.z, -1.0, epsilon = EPSILON);

@@ -102,26 +102,30 @@ impl Draw for Vector3<f32> {
 impl Draw for Shape {
     fn draw(&self, camera: &Camera, canvas: &Canvas, frame: &mut [u8], z_buffer: &mut [f32]) {
         for t in self.triangles.iter() {
-            draw_triangle(t, self.transform, camera, canvas, frame, z_buffer);
+            draw_triangle(t, &self.transform, camera, canvas, frame, z_buffer);
         }
     }
 }
 
 fn draw_triangle(
     triangle: &Triangle<f32>,
-    to_world: Matrix4x4<f32>,
+    to_world: &Matrix4x4<f32>,
     camera: &Camera,
     canvas: &Canvas,
     frame: &mut [u8],
     z_buffer: &mut [f32],
 ) {
-    let to_screen = to_world * camera.view_projection;
+    let to_screen = to_world * &camera.view_projection;
     let mut colours = triangle.colours;
-    let mut raster_points = [Vector3::new(0.0, 0.0, 0.0); 3];
+    let mut raster_points = [
+        Vector3::default(),
+        Vector3::default(),
+        Vector3::default(),
+    ];
     let mut z_clipped = false;
 
     for i in 0..3 {
-        let screen_point = triangle.points[i] * to_screen;
+        let screen_point = &triangle.points[i] * &to_screen;
         let (x, y) = to_raster_space(screen_point.x, screen_point.y, canvas.width, canvas.height);
 
         raster_points[i].x = x;
@@ -156,7 +160,7 @@ fn draw_triangle(
         return;
     }
 
-    if !triangle.double_side && raster_triangle.normal.dot(camera.forward) > 0.0 {
+    if !triangle.double_side && raster_triangle.normal.dot(&camera.forward) > 0.0 {
         // ignore triangle back faces (facing away from camera)
         return;
     }

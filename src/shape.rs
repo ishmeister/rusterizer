@@ -42,9 +42,9 @@ pub fn colour_cube() -> Shape {
 
     for (i, tri_idx) in triangle_idxs.iter().enumerate() {
         let mut triangle = Triangle::new([
-            Vector3::from_array(vertices[tri_idx[0]]),
-            Vector3::from_array(vertices[tri_idx[1]]),
-            Vector3::from_array(vertices[tri_idx[2]]),
+            Vector3::from(vertices[tri_idx[0]]),
+            Vector3::from(vertices[tri_idx[1]]),
+            Vector3::from(vertices[tri_idx[2]]),
         ]);
 
         let col_idx = i * 3;

@@ -39,7 +39,7 @@ fn raster_benchmark(c: &mut Criterion) {
     shapes.push(colour_cube());
 
     let translation = translation(0.0, 0.0, -5.0);
-    shapes.iter_mut().for_each(|s| s.transform = translation);
+    shapes.iter_mut().for_each(|s| s.transform = translation.clone());
 
     c.bench_function("to_raster_space", |b| {
         b.iter(|| black_box(to_raster_space(-0.5, -0.5, width, height)))
