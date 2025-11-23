@@ -44,12 +44,8 @@ fn main() -> Result<(), Error> {
     let camera = default_camera(canvas.width as f32, canvas.height as f32);
 
     let mut z_buffer = vec![f32::MAX; canvas.width as usize * canvas.height as usize];
-
     let mut shapes = vec![colour_cube()];
-
     let mut rotation_rad: f32 = 0.0;
-    let translation = translation(0.0, 0.0, -5.0);
-    let scaling = scaling(1.0, 1.0, 1.0);
 
     event_loop.run(move |event, _, control_flow| {
         // Draw the current frame
@@ -60,7 +56,9 @@ fn main() -> Result<(), Error> {
             let rotation =
                 rotation_x(rotation_rad) * rotation_y(rotation_rad) * rotation_z(rotation_rad);
 
-            let transform = &scaling * &translation * rotation;
+            let scaling = scaling(1.0, 1.0, 1.0);
+            let translation = translation(0.0, 0.0, -5.0);
+            let transform = rotation * translation * scaling;
             shapes
                 .iter_mut()
                 .for_each(|s| s.transform = transform.clone());

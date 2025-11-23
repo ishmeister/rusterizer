@@ -3,7 +3,7 @@ use crate::EPSILON;
 use std::f32;
 use std::ops;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct Vector3<T> {
     pub x: T,
     pub y: T,
@@ -65,13 +65,6 @@ impl ops::Sub for Vector3<f32> {
     }
 }
 
-impl ops::Sub<&Vector3<f32>> for &Vector3<f32> {
-    type Output = Vector3<f32>;
-    fn sub(self, rhs: &Vector3<f32>) -> Vector3<f32> {
-        Vector3::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
-    }
-}
-
 impl ops::Add for Vector3<f32> {
     type Output = Vector3<f32>;
     fn add(self, rhs: Vector3<f32>) -> Vector3<f32> {
@@ -79,23 +72,9 @@ impl ops::Add for Vector3<f32> {
     }
 }
 
-impl ops::Add<&Vector3<f32>> for &Vector3<f32> {
-    type Output = Vector3<f32>;
-    fn add(self, rhs: &Vector3<f32>) -> Vector3<f32> {
-        Vector3::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
-    }
-}
-
 impl ops::Mul for Vector3<f32> {
     type Output = Vector3<f32>;
     fn mul(self, rhs: Vector3<f32>) -> Vector3<f32> {
-        Vector3::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
-    }
-}
-
-impl ops::Mul<&Vector3<f32>> for &Vector3<f32> {
-    type Output = Vector3<f32>;
-    fn mul(self, rhs: &Vector3<f32>) -> Vector3<f32> {
         Vector3::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
     }
 }
@@ -108,13 +87,6 @@ impl ops::Mul<f32> for Vector3<f32> {
 }
 
 // for row-major multiplications with a point
-impl ops::Mul<&Matrix4x4<f32>> for &Vector3<f32> {
-    type Output = Vector3<f32>;
-    fn mul(self, rhs: &Matrix4x4<f32>) -> Vector3<f32> {
-        rhs.mul_point(&self)
-    }
-}
-
 impl ops::Mul<&Matrix4x4<f32>> for Vector3<f32> {
     type Output = Vector3<f32>;
     fn mul(self, rhs: &Matrix4x4<f32>) -> Vector3<f32> {

@@ -11,7 +11,7 @@ pub struct Matrix4x4<T> {
 
 impl Default for Matrix4x4<f32> {
     fn default() -> Self {
-        Self::new()
+        identity()
     }
 }
 

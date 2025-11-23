@@ -115,7 +115,7 @@ fn draw_triangle(
     let mut z_clipped = false;
 
     for i in 0..3 {
-        let screen_point = &triangle.points[i] * &to_screen;
+        let screen_point = triangle.points[i] * &to_screen;
         let (x, y) = to_raster_space(screen_point.x, screen_point.y, canvas.width, canvas.height);
 
         raster_points[i].x = x;

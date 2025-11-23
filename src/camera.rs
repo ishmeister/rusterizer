@@ -30,7 +30,7 @@ impl Camera {
         }
     }
 
-    pub fn look_at(&mut self, from: &Vector3<f32>, to: &Vector3<f32>, up: &Vector3<f32>) {
+    pub fn look_at(&mut self, from: Vector3<f32>, to: Vector3<f32>, up: Vector3<f32>) {
         let forward = (from - to).normalize();
         let right = up.normalize().cross(&forward);
         let true_up = forward.cross(&right);
@@ -61,9 +61,9 @@ fn projection(fov: f32, near: f32, far: f32, aspect: f32) -> Matrix4x4<f32> {
 pub fn default_camera(width: f32, height: f32) -> Camera {
     let mut camera = Camera::new(45.0, 0.1, 100.0, width / height);
     camera.look_at(
-        &Vector3::new(0.0, 0.0, 0.0),
-        &Vector3::new(0.0, 0.0, -1.0),
-        &Vector3::new(0.0, 1.0, 0.0),
+        Vector3::new(0.0, 0.0, 0.0),
+        Vector3::new(0.0, 0.0, -1.0),
+        Vector3::new(0.0, 1.0, 0.0),
     );
     camera
 }

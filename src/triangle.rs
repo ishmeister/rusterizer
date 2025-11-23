@@ -11,8 +11,8 @@ pub struct Triangle<T> {
 impl Triangle<f32> {
     pub fn new(points: [Vector3<f32>; 3]) -> Self {
         let colours = [GREY; 3];
-        let edge0 = &points[1] - &points[0];
-        let edge1 = &points[2] - &points[0];
+        let edge0 = points[1] - points[0];
+        let edge1 = points[2] - points[0];
         let normal = edge0.cross(&edge1).normalize();
 
         Triangle::<f32> {
@@ -35,18 +35,18 @@ pub struct TriangleComputations<T> {
 impl TriangleComputations<f32> {
     pub fn new(t: &Triangle<f32>, x_start: f32, y_start: f32) -> Self {
         let edges = [
-            &t.points[1] - &t.points[2],
-            &t.points[2] - &t.points[0],
-            &t.points[0] - &t.points[1],
+            t.points[1] - t.points[2],
+            t.points[2] - t.points[0],
+            t.points[0] - t.points[1],
         ];
 
         // area of parallelogram (2x triangle area)
         let area = edge_function(&t.points[0], &t.points[1], &t.points[2]);
 
         // pre-compute linear edge function variables
-        let mut w0_params = edge_function_params(&t.points[1], &t.points[2], x_start, y_start);
-        let mut w1_params = edge_function_params(&t.points[2], &t.points[0], x_start, y_start);
-        let mut w2_params = edge_function_params(&t.points[0], &t.points[1], x_start, y_start);
+        let mut w0_params = edge_function_params(t.points[1], t.points[2], x_start, y_start);
+        let mut w1_params = edge_function_params(t.points[2], t.points[0], x_start, y_start);
+        let mut w2_params = edge_function_params(t.points[0], t.points[1], x_start, y_start);
 
         // scale each param by area to avoid division in the main loop
         for i in 0..5 {
@@ -116,8 +116,8 @@ impl TriangleComputations<f32> {
 }
 
 fn edge_function_params(
-    p1: &Vector3<f32>,
-    p2: &Vector3<f32>,
+    p1: Vector3<f32>,
+    p2: Vector3<f32>,
     x_start: f32,
     y_start: f32,
 ) -> [f32; 5] {
