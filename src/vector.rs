@@ -3,7 +3,7 @@ use crate::EPSILON;
 use std::f32;
 use std::ops;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Vector3<T> {
     pub x: T,
     pub y: T,
@@ -13,10 +13,6 @@ pub struct Vector3<T> {
 impl Vector3<f32> {
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Vector3::<f32> { x, y, z }
-    }
-
-    pub fn default() -> Self {
-        Vector3::new(0.0, 0.0, 0.0)
     }
 
     pub fn from(coords: [f32; 3]) -> Self {
